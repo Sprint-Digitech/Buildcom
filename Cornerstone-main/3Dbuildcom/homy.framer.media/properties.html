@@ -7016,6 +7016,7 @@
 <style id="csb-cleanup-style">
 #__framer-badge-container,
 [data-framer-name="Crafted By"],
+[data-framer-name="Price"],
 .framer-1aoxwi1,
 .framer-ym18wf {
   display: none !important;
@@ -7023,12 +7024,12 @@
 </style>
 <script id="csb-cleanup-script">
 (function() {
-  const priceRe = /$s*d[d,]*(?:s*[–-]s*$s*d[d,]*)?+?/g;
+  const priceRe = /\$\s*\d[\d,]*(?:\s*[–-]\s*\$\s*\d[\d,]*)?\+?/g;
   const replacements = [
     [/New York Office/gi, 'Noida Office'],
     [/New York, USA/gi, '111-F-Block, Sector-8 Noida-201301'],
     [/Broadway/gi, '111-F-Block, Sector-8 Noida-201301'],
-    [/New York/gi, 'Noida']
+    [/\bNew York\b/gi, 'Noida']
   ];
 
   function cleanText(text) {
@@ -7037,13 +7038,14 @@
       out = out.replace(pattern, value);
     }
     out = out.replace(priceRe, '');
-    out = out.replace(/s{2,}/g, ' ');
-    out = out.replace(/s+([,.;:!?])/g, '$1');
+    out = out.replace(/\$/g, '');
+    out = out.replace(/\s{2,}/g, ' ');
+    out = out.replace(/\s+([,.;:!?])/g, '$1');
     return out.trim();
   }
 
   function removeTargets() {
-    document.querySelectorAll('#__framer-badge-container,[data-framer-name="Crafted By"],.framer-1aoxwi1,.framer-ym18wf').forEach((el) => el.remove());
+    document.querySelectorAll('#__framer-badge-container,[data-framer-name="Crafted By"],[data-framer-name="Price"],.framer-1aoxwi1,.framer-ym18wf').forEach((el) => el.remove());
   }
 
   function walk(node) {
@@ -7055,7 +7057,7 @@
     }
     if (node.nodeType !== Node.ELEMENT_NODE) return;
     if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(node.tagName)) return;
-    if (node.id === '__framer-badge-container' || node.matches?.('[data-framer-name="Crafted By"], .framer-1aoxwi1, .framer-ym18wf')) {
+    if (node.id === '__framer-badge-container' || node.matches?.('[data-framer-name="Crafted By"],[data-framer-name="Price"],.framer-1aoxwi1,.framer-ym18wf')) {
       node.remove();
       return;
     }
@@ -7068,7 +7070,7 @@
   function run() {
     scheduled = false;
     removeTargets();
-    walk(document.body);
+    if (document.body) walk(document.body);
   }
 
   function schedule() {
@@ -7079,6 +7081,9 @@
 
   const root = document.documentElement || document;
   new MutationObserver(schedule).observe(root, { childList: true, subtree: true, characterData: true });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run, { once: true });
+  }
   run();
 })();
 </script>
